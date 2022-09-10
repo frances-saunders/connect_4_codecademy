@@ -51,7 +51,83 @@ def select_space(gameboard, column, player):
             return True
     return False
 
-my_board = make_board()
+#check for winner
+def available_moves(gameboard):
+    # Returns the columns that are open
+    moves = []
+    for i in range(1, len(gameboard)+1):
+        if is_move_valid(gameboard, i):
+            moves.append(i)
+    return moves
+
+def has_won(gameboard, symbol):
+    # check horizontal spaces
+    for y in range(len(gameboard[0])):
+        for x in range(len(gameboard) - 3):
+            if gameboard[x][y] == symbol and gameboard[x+1][y] == symbol and gameboard[x+2][y] == symbol and gameboard[x+3][y] == symbol:
+                return True
+
+    # check vertical spaces
+    for x in range(len(gameboard)):
+        for y in range(len(gameboard[0]) - 3):
+            if gameboard[x][y] == symbol and gameboard[x][y+1] == symbol and gameboard[x][y+2] == symbol and gameboard[x][y+3] == symbol:
+                return True
+
+    # check / diagonal spaces
+    for x in range(len(gameboard) - 3):
+        for y in range(3, len(gameboard[0])):
+            if gameboard[x][y] == symbol and gameboard[x+1][y-1] == symbol and gameboard[x+2][y-2] == symbol and gameboard[x+3][y-3] == symbol:
+                return True
+
+    # check \ diagonal spaces
+    for x in range(len(gameboard) - 3):
+        for y in range(len(gameboard[0]) - 3):
+            if gameboard[x][y] == symbol and gameboard[x+1][y+1] == symbol and gameboard[x+2][y+2] == symbol and gameboard[x+3][y+3] == symbol:
+                return True
+
+    return False
+
+def game_is_over(gameboard):
+  # Returns True if either player has won the game or if there are no open columns
+  return has_won(gameboard, "R") or has_won(gameboard, "B") or len(available_moves(gameboard)) == 0
+
+def play_game():
+    # Creating an empty gameboard
+    my_board = []
+    for col in range(7):
+        my_board.append([' '] * 6)
+
+    # Starting the game with R going first    
+    turn = "R"
+    winner = False
+    while(not game_is_over(my_board)):
+
+        print_board(my_board)
+        move = 0
+        available = available_moves(my_board)
+        # Continuing to ask for a valid move until the user gives one
+        while (move not in available):
+            move = int(input("It is " + turn + "'s turn. Please select a column. Your optionns are " + str(available)))
+        select_space(my_board, move, turn)
+        # Checking to see if this move wins the game for the player. If so, exiting the loop
+        if has_won(my_board, turn):
+            print(turn + " has won!")
+            print_board(my_board)
+            winner = True
+            break
+
+        # Switching the players turn
+        if turn == 'R':
+            turn = "B"
+        else:
+            turn = 'R'
+    # If we exit the loop and haven't determined a winner, that means it was a tie
+    if not winner:
+        print("It was a tie!")
+        print_board(my_board)
+
+play_game()
+
 print("Enter in the column number 1 through 7 as the first argument and R for red or B for blue as the second argument to place your piece in the board.\n")
 #game moves
 select_space(my_board, 0, 'R')
